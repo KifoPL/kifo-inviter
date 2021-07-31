@@ -1,0 +1,31 @@
+{
+  "name": "kifo-inviter",
+  "version": "1.0.0",
+  "description": "auto invite manager for discord servers",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/KifoPL/kifo-inviter.git"
+  },
+  "keywords": [
+    "kifo",
+    "inviter"
+  ],
+  "author": "KifoPL <kifounaabi@gmail.com> (https://bio.link/KifoPL)",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/KifoPL/kifo-inviter/issues"
+  },
+  "homepage": "https://github.com/KifoPL/kifo-inviter#readme",
+  "dependencies": {
+    "discord.js": "^13.0.0-dev.t1627722888.65ae064",
+    "dotenv": "^10.0.0",
+    "fs": "^0.0.1-security",
+    "kifo": "^2.0.1",
+    "ms": "^2.1.3",
+    "mysql": "^2.18.1"
+  }
+}
