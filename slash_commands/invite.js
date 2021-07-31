@@ -56,7 +56,7 @@ module.exports = {
 	//itr = interaction
 	async execute(itr) {
 		await itr.defer({ ephemeral: true });
-		const { autoinvites, con } = require(`../index.js`);
+		const { autoinvites, con, autoinvitesUses } = require(`../index.js`);
 		let subcmd = itr.options.data[0];
 		if (subcmd.name === "new") {
 			let inviter = subcmd.options.find(
@@ -102,7 +102,7 @@ module.exports = {
 				con.query(
 					"INSERT INTO invites (InviterId , RoleId, GuildId , ChannelId , Message) VALUES (?, ?, ?, ?, ?)",
 					[inviter.id, role.id, itr.guildId, channel.id, message],
-					function (err) {
+					async function (err) {
 						if (err) throw err;
 						autoinvites.set(`${itr.guildId}${inviter.id}`, {
 							InviterId: inviter.id,
@@ -111,6 +111,14 @@ module.exports = {
 							ChannelId: channel?.id,
 							Message: message ?? null,
 						});
+						let uses = 0;
+						await itr.guild.invites.fetch().then(invites => {
+							invites.filter(invites => invites.inviter.id == inviter.id)
+							.each(i => {
+								uses += i.uses;
+							})
+						})
+						autoinvitesUses.set(`${itr.guildId}${inviter.id}`, uses)
 						itr.editReply({
 							embeds: [
 								kifo.embed(
@@ -144,6 +152,7 @@ module.exports = {
 					function (err) {
 						if (err) throw err;
 						autoinvites.delete(`${itr.guildId}${inviter.id}`);
+						autoinvitesUses.delete(`${itr.guildId}${inviter.id}`);
 						return itr.editReply({
 							embeds: [
 								kifo.embed(

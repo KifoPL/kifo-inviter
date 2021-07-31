@@ -322,6 +322,7 @@ client.once("ready", async () => {
 				console.log(`Loaded ${result.length} invite managers!`);
 			}
 			module.exports.autoinvites = autoinvites;
+			module.exports.autoinvitesUses = autoinvitesUses;
 		}
 	);
 
