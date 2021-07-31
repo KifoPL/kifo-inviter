@@ -575,8 +575,8 @@ exports.log = function (log, ...args) {
 
 client.login(process.env.LOGIN_TOKEN);
 
-// process.on("uncaughtException", async (err) => {
-// 	console.error(err);
-// 	console.log(err);
-// 	await main.log(err);
-// });
+process.on("uncaughtException", async (err) => {
+	console.error(err);
+	console.log(err);
+	await main.log(err);
+});
