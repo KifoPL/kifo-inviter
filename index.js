@@ -273,6 +273,12 @@ let clientapp;
 //that's @KifoPL#3358
 let Owner;
 
+function dbPing() {
+	con.query("SELECT * FROM invites", [], function (err,result) {
+		if (err) throw err;
+	});
+}
+
 client.once("ready", async () => {
 	console.log("Kifo Clanker™ is online!");
 	loadowner();
@@ -331,6 +337,8 @@ client.once("ready", async () => {
 	//This line is executed by default, but I'm just making sure the status is online (other factors could change the status)
 	updatePresence();
 	setInterval(updatePresence, 1000 * 60);
+	dbPing();
+	setInterval(dbPing, 1000 * 60 * 60 * 5);
 	console.log("Presence set!");
 });
 
