@@ -134,7 +134,7 @@ async function commands(message, prefix) {
 	//If command detected, create args struct
 	let args = message.content.slice(prefix.length).split(/ +/);
 	let command = args.shift().toLowerCase();
-	if (command == "deploy" && message.author == Owner) {
+		if (command == "deploy" && message.author == Owner) {
 		const btnRow1 = new MessageActionRow().addComponents(
 			new MessageButton()
 				.setCustomId("deploy_guild")
@@ -153,6 +153,10 @@ async function commands(message, prefix) {
 			new MessageButton()
 				.setCustomId("undeploy_global")
 				.setLabel("Delete Production")
+				.setStyle("DANGER"),
+			new MessageButton()
+				.setCustomId("undeploy_all")
+				.setLabel("Delete Both")
 				.setStyle("DANGER")
 		);
 		message.channel
@@ -208,16 +212,18 @@ async function commands(message, prefix) {
 							}
 						}
 						if (btnItr.customId == "undeploy_guild") {
-							clientapp.commands.fetch().then((cmds) =>
-								cmds.each((cmd) => {
-									console.log(cmd.name);
-									console.log(cmd.guildId);
-									if (cmd.guild != null) {
+							clientapp.commands
+								.fetch({ guildId: btnItr.guildId })
+								.then((cmds) =>
+									cmds.each((cmd) => {
 										console.log(cmd.name);
-										cmd.delete();
-									}
-								})
-							);
+										console.log(cmd.guildId);
+										if (cmd.guild != null) {
+											console.log(cmd.name);
+											cmd.delete();
+										}
+									})
+								);
 							btnItr.reply({
 								embeds: [kifo.embed("DELETED from test!")],
 							});
@@ -239,6 +245,24 @@ async function commands(message, prefix) {
 								],
 							});
 						}
+						if (btnItr.customId == "undeploy_both") {
+							clientapp.commands.fetch().then((cmds) =>
+								cmds.each((cmd) => {
+									console.log(cmd.name);
+									cmd.delete();
+								})
+							);
+							clientapp.commands.fetch({
+								guildId: btnItr.guildId,
+							});
+							btnItr.reply({
+								embeds: [
+									kifo.embed(
+										"DELETED from production (will take up to an hour) and test!"
+									),
+								],
+							});
+						}
 						msg.edit({ components: [] });
 					})
 					.catch((err) => {
@@ -250,17 +274,29 @@ async function commands(message, prefix) {
 	}
 	if (command == "cmdlist" && message.author == Owner) {
 		let reply = kifo.embed("", "/ Command list:");
-		clientapp.commands.fetch().then((cmds) => {
-			cmds.each((cmd) => {
-				reply.addField(
-					`${cmd.name}`,
-					`Guild: ${cmd.guildId}\nOptions: ${cmd.options
-						.map((o) => `${o.name}`)
-						.join(", ")}`
-				);
+		clientapp.commands
+			.fetch({ guildId: `${message.guild.id}` })
+			.then((cmds) => {
+				cmds.each((cmd) => {
+					reply.addField(
+						`${cmd.name}`,
+						`Guild: ${cmd.guildId}\nOptions: ${cmd.options
+							.map((o) => `${o.name}`)
+							.join(", ")}`
+					);
+				});
+				clientapp.commands.fetch().then((cmds1) => {
+					cmds1.each((cmd) => {
+						reply.addField(
+							`${cmd.name}`,
+							`Guild: ${cmd.guildId}\nOptions: ${cmd.options
+								.map((o) => `${o.name}`)
+								.join(", ")}`
+						);
+						message.reply({ embeds: [reply] });
+					});
+				});
 			});
-			message.reply({ embeds: [reply] });
-		});
 	}
 }
 
