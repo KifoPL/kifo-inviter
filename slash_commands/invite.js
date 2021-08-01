@@ -49,6 +49,11 @@ module.exports = {
 				},
 			],
 		},
+		{
+			name: "list",
+			type: "SUB_COMMAND",
+			description: "Lists all auto-invites.",
+		},
 	],
 	defaultPermission: true,
 	perms: ["USE_SLASH_COMMANDS"],
@@ -74,7 +79,10 @@ module.exports = {
 					.editReply({
 						embeds: [
 							kifo.embed(
-								"There's already an auto-inviter set for this person!"
+								"There's already an auto-inviter set for this person!",
+								"INFO:",
+								itr.user,
+								itr.client
 							),
 						],
 						ephemeral: true,
@@ -86,14 +94,24 @@ module.exports = {
 				channel.type !== "GUILD_TEXT"
 			)
 				return itr.editReply({
-					embeds: [kifo.embed("The channel must be a text channel.")],
+					embeds: [
+						kifo.embed(
+							"The channel must be a text channel.",
+							"INFO:",
+							itr.user,
+							itr.client
+						),
+					],
 					ephemeral: true,
 				});
 			if (message != null && message.length > 2000)
 				return itr.editReply({
 					embeds: [
 						kifo.embed(
-							"The message cannot exceed 2000 characters."
+							"The message cannot exceed 2000 characters.",
+							"INFO:",
+							itr.user,
+							itr.client
 						),
 					],
 					ephemeral: true,
@@ -112,17 +130,27 @@ module.exports = {
 							Message: message ?? null,
 						});
 						let uses = 0;
-						await itr.guild.invites.fetch().then(invites => {
-							invites.filter(invites => invites.inviter.id == inviter.id)
-							.each(i => {
-								uses += i.uses;
-							})
-						})
-						autoinvitesUses.set(`${itr.guildId}${inviter.id}`, uses)
+						await itr.guild.invites.fetch().then((invites) => {
+							invites
+								.filter(
+									(invites) =>
+										invites.inviter.id == inviter.id
+								)
+								.each((i) => {
+									uses += i.uses;
+								});
+						});
+						autoinvitesUses.set(
+							`${itr.guildId}${inviter.id}`,
+							uses
+						);
 						itr.editReply({
 							embeds: [
 								kifo.embed(
-									"Succesfully added new auto-invite!"
+									"Succesfully added new auto-invite!",
+									"INFO:",
+									itr.user,
+									itr.client
 								),
 							],
 							ephemeral: false,
@@ -142,7 +170,14 @@ module.exports = {
 			).member;
 			if (!autoinvites.has(`${itr.guildId}${inviter.id}`))
 				return itr.editReply({
-					embeds: [kifo.embed("There is nothing to delete!")],
+					embeds: [
+						kifo.embed(
+							"There is nothing to delete!",
+							"INFO:",
+							itr.user,
+							itr.client
+						),
+					],
 					ephemeral: true,
 				});
 			try {
@@ -156,7 +191,10 @@ module.exports = {
 						return itr.editReply({
 							embeds: [
 								kifo.embed(
-									`Succesfully deleted auto-invite feature for <@!${inviter.id}>!`
+									`Succesfully deleted auto-invite feature for <@!${inviter.id}>!`,
+									`INFO:`,
+									itr.user,
+									itr.client
 								),
 							],
 							ephemeral: false,
@@ -169,6 +207,29 @@ module.exports = {
 					ephemeral: true,
 				});
 			}
+		}
+		if (subcmd.name === "list") {
+			let replyEmbed = kifo.embed(
+				"",
+				"List of enabled auto-invites:",
+				itr.user,
+				itr.client
+			);
+			autoinvites.forEach((val, key) => {
+				if (key.startsWith(`${itr.guildId}`)) {
+					replyEmbed.addField(
+						`${itr.guild.members.resolve(val.InviterId)}`,
+						`People invited by <@!${val.InviterId}> receive <@&${
+							val.RoleId
+						}>.${
+							val.Message != null
+								? `\nMessage sent in DMs (or in <#${val.ChannelId}>):\n${val.Message}`
+								: ""
+						}`
+					);
+				}
+			});
+			itr.editReply({ embeds: [replyEmbed], ephemeral: true });
 		}
 	},
 	async button(itr) {
