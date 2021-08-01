@@ -218,12 +218,12 @@ module.exports = {
 			autoinvites.forEach((val, key) => {
 				if (key.startsWith(`${itr.guildId}`)) {
 					replyEmbed.addField(
-						`${itr.guild.members.resolve(val.InviterId)}`,
+						`${itr.guild.members.resolve(val.InviterId).displayName}`,
 						`People invited by <@!${val.InviterId}> receive <@&${
 							val.RoleId
 						}>.${
 							val.Message != null
-								? `\nMessage sent in DMs (or in <#${val.ChannelId}>):\n${val.Message}`
+								? `\n\nMessage sent in DMs (or in <#${val.ChannelId}>):\n${val.Message}`
 								: ""
 						}`
 					);
