@@ -134,7 +134,7 @@ async function commands(message, prefix) {
 	//If command detected, create args struct
 	let args = message.content.slice(prefix.length).split(/ +/);
 	let command = args.shift().toLowerCase();
-		if (command == "deploy" && message.author == Owner) {
+	if (command == "deploy" && message.author == Owner) {
 		const btnRow1 = new MessageActionRow().addComponents(
 			new MessageButton()
 				.setCustomId("deploy_guild")
@@ -214,16 +214,12 @@ async function commands(message, prefix) {
 						if (btnItr.customId == "undeploy_guild") {
 							clientapp.commands
 								.fetch({ guildId: btnItr.guildId })
-								.then((cmds) =>
+								.then((cmds) => {
 									cmds.each((cmd) => {
 										console.log(cmd.name);
-										console.log(cmd.guildId);
-										if (cmd.guild != null) {
-											console.log(cmd.name);
-											cmd.delete();
-										}
-									})
-								);
+										cmd.delete();
+									});
+								});
 							btnItr.reply({
 								embeds: [kifo.embed("DELETED from test!")],
 							});
@@ -231,7 +227,7 @@ async function commands(message, prefix) {
 						if (btnItr.customId == "undeploy_global") {
 							clientapp.commands.fetch().then((cmds) =>
 								cmds.each((cmd) => {
-									if (cmd.guild == null) {
+									if (cmd.guildId == null) {
 										console.log(cmd.name);
 										cmd.delete();
 									}
@@ -252,9 +248,16 @@ async function commands(message, prefix) {
 									cmd.delete();
 								})
 							);
-							clientapp.commands.fetch({
-								guildId: btnItr.guildId,
-							});
+							clientapp.commands
+								.fetch({
+									guildId: btnItr.guildId,
+								})
+								.then((cmds) => {
+									cmds.each((cmd) => {
+										console.log(cmd.name);
+										cmd.delete();
+									});
+								});
 							btnItr.reply({
 								embeds: [
 									kifo.embed(
@@ -285,7 +288,9 @@ async function commands(message, prefix) {
 							.join(", ")}`
 					);
 				});
+				console.log("test");
 				clientapp.commands.fetch().then((cmds1) => {
+					console.log("test");
 					cmds1.each((cmd) => {
 						reply.addField(
 							`${cmd.name}`,
@@ -293,10 +298,11 @@ async function commands(message, prefix) {
 								.map((o) => `${o.name}`)
 								.join(", ")}`
 						);
-						message.reply({ embeds: [reply] });
 					});
+					message.reply({ embeds: [reply] });
 				});
 			});
+		return;
 	}
 }
 
