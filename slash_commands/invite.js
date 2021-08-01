@@ -119,7 +119,7 @@ module.exports = {
 			try {
 				con.query(
 					"INSERT INTO invites (InviterId , RoleId, GuildId , ChannelId , Message) VALUES (?, ?, ?, ?, ?)",
-					[inviter.id, role.id, itr.guildId, channel.id, message],
+					[inviter.id, role.id, itr.guildId, channel?.id, message],
 					async function (err) {
 						if (err) throw err;
 						autoinvites.set(`${itr.guildId}${inviter.id}`, {
