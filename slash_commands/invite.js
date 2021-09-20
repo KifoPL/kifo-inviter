@@ -60,7 +60,7 @@ module.exports = {
 
 	//itr = interaction
 	async execute(itr) {
-		await itr.defer({ ephemeral: true });
+		await itr.deferReply({ ephemeral: true });
 		const { autoinvites, con, autoinvitesUses } = require(`../index.js`);
 		let subcmd = itr.options.data[0];
 		if (subcmd.name === "new") {
